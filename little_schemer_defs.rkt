@@ -13,7 +13,7 @@
   (lambda (a lat)
 	(cond
 	  ((null? lat) #f)
-	  (else (or (eq? a (car lat)) (member? a (cdr lat))) #t))))
+	  (else (or (equal? a (car lat)) (member? a (cdr lat)))))))
 
 (define rember
   (lambda (s l)
