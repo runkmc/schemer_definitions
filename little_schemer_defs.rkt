@@ -70,7 +70,7 @@
 	  ((null? lat) '())
 	  (else
 		(cond
-		  ((eq? a (car lat)) (multirember a (cdr lat)))
+		  ((equal? a (car lat)) (multirember a (cdr lat)))
 		  (else (cons (car lat) (multirember a (cdr lat)))))))))
 
 (define multiinsertR
