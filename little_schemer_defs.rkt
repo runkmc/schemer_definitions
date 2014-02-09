@@ -161,7 +161,7 @@
   (lambda (n m)
     (cond
       ((zero? m) 1)
-      (else (o* n (exponent n (sub1 m)))))))
+      (else (o* n (o^ n (sub1 m)))))))
 
 (define o/
   (lambda (n m)
@@ -296,3 +296,10 @@
       ((or (atom? s1) (atom? s2)) #f)
       (else
        (eqlist? s1 s2)))))
+
+(define numbered?
+  (lambda (aexp)
+    (cond
+      ((atom? aexp) (number? aexp))
+      (else (and (numbered? (car aexp)) (numbered? (car (cdr aexp))))))))
+
