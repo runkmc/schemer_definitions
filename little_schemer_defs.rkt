@@ -16,11 +16,11 @@
 	  (else (or (eq? a (car lat)) (member? a (cdr lat))) #t))))
 
 (define rember
-  (lambda (a lat)
-	(cond
-	  ((null? lat) '())
-	  ((eq? a (car lat)) (cdr lat))
-	  (else (cons (car lat) (rember a (cdr lat)))))))
+  (lambda (s l)
+    (cond
+      ((null? l) '())
+      ((oequal? s (car l)) (cdr l))
+      (else (cons (car l) (rember s (cdr l)))))))
 
 (define firsts
   (lambda (l)
@@ -218,3 +218,81 @@
 (define one?
   (lambda (a)
     (o= a 1)))
+
+(define rember*
+  (lambda (a lat)
+    (cond
+      ((null? lat) '())
+      ((atom? (car lat))
+       (cond
+         ((eq? a (car lat)) (rember* a (cdr lat)))
+         (else (cons (car lat) (rember* a (cdr lat))))))
+      (else (cons (rember* a (car lat)) (rember* a (cdr lat)))))))
+
+(define insertR*
+  (lambda (new old lat)
+    (cond
+      ((null? lat) '())
+      ((atom? (car lat))
+       (cond
+         ((eq? old (car lat)) (cons old (cons new (insertR* new old (cdr lat)))))
+         (else (cons (car lat) (insertR* new old (cdr lat))))))
+      (else (cons (insertR* new old (car lat)) (insertR* new old (cdr lat)))))))
+
+(define occur*
+  (lambda (a lat)
+    (cond
+      ((null? lat) 0)
+      ((atom? (car lat))
+       (cond
+         ((eq? a (car lat)) (add1 (occur* a (cdr lat))))
+         (else (occur* a (cdr lat)))))
+      (else (o+ (occur* a (car lat)) (occur* a (cdr lat)))))))
+
+(define subst*
+  (lambda (new old lat)
+    (cond
+      ((null? lat) '())
+      ((atom? (car lat))
+       (cond
+         ((eq? old (car lat)) (cons new (subst* new old (cdr lat))))
+         (else (cons (car lat) (subst* new old (cdr lat))))))
+      (else (cons (subst* new old (car lat)) (subst* new old (cdr lat)))))))
+
+(define insertL*
+  (lambda (new old lat)
+    (cond
+      ((null? lat) '())
+      ((atom? (car lat))
+       (cond
+         ((eq? old (car lat)) (cons new (cons old (insertL* new old (cdr lat)))))
+         (else (cons (car lat) (insertL* new old (cdr lat))))))
+      (else (cons (insertL* new old (car lat)) (insertL* new old (cdr lat)))))))
+
+(define member*
+  (lambda (a lat)
+    (cond
+      ((null? lat) #f)
+      ((atom? (car lat)) (or (eq? a (car lat)) (member* a (cdr lat))))
+      (else (or (member* a (car lat)) (member a (cdr lat)))))))
+
+(define leftmost
+  (lambda (lat)
+    (cond
+      ((atom? (car lat)) (car lat))
+      (else (leftmost (car lat))))))
+
+(define eqlist?
+  (lambda (ls1 ls2)
+    (cond
+      ((and (null? ls1) (null? ls2)) #t)
+      ((or (null? ls1) (null? ls2) #f))
+      (else (and (oequal? (car ls1) (car ls2)) (eqlist? (cdr ls1) (cdr ls2)))))))
+
+(define oequal?
+  (lambda (s1 s2)
+    (cond
+      ((and (atom? s1) (atom? s2)) (eqan? s1 s2))
+      ((or (atom? s1) (atom? s2)) #f)
+      (else
+       (eqlist? s1 s2)))))
