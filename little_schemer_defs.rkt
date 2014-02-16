@@ -315,7 +315,7 @@
   (lambda (aexp)
     (car (cdr aexp))))
 
-(define value
+(define oldvalue
   (lambda (nexp)
     (cond
       ((atom? nexp) nexp)
@@ -433,3 +433,79 @@
     (cond
       ((null? s) '())
       (else (cons (second (car s)) (seconds (cdr s)))))))
+
+(define rember-f
+  (lambda (test?)
+    (lambda (a l)
+      (cond
+        ((null? l) '())
+        ((test? a (car l)) (cdr l))
+        (else (cons (car l) ((rember-f test?) a (cdr l))))))))
+
+(define eq?-c
+  (lambda (a)
+    (lambda (x)
+      (eq? a x))))
+
+(define insert-g
+  (lambda (seq)
+    (lambda (new old lat)
+      (cond
+        ((null? lat) '())
+        ((eq? old (car lat)) (seq new old (cdr lat)))
+        (else (cons (car lat) ((insert-g seq) new old (cdr lat))))))))
+
+(define insertL-f
+  (insert-g (lambda (new old lat) (cons new (cons old lat)))))
+
+(define insertR-f
+  (insert-g (lambda (new old lat) (cons old (cons new lat)))))
+
+(define atom-to-function
+  (lambda (x)
+    (cond
+      ((eq? x (quote +)) o+)
+      ((eq? x (quote *)) o*)
+      (else o^))))
+
+(define value
+  (lambda (nexp)
+    (cond
+      ((atom? nexp) nexp)
+      (else ((atom-to-function (operator nexp)) (value (1st-sub-exp nexp)) (value (2nd-sub-exp nexp)))))))
+
+(define multirember-f
+  (lambda (test?)
+    (lambda (a lat)
+      (cond
+        ((null? lat) '())
+        ((test? a (car lat)) ((multirember-f test?) a (cdr lat)))
+        (else (cons (car lat) ((multirember-f test?) a (cdr lat))))))))
+
+(define eq-tuna?
+  (eq?-c 'tuna))
+
+(define multiremberT
+  (lambda (test? lat)
+    (cond
+      ((null? lat) '())
+      ((test? (car lat)) (multiremberT test? (cdr lat)))
+      (else (cons (car lat) (multiremberT test? (cdr lat)))))))
+
+(define multirember&co
+  (lambda (a lat col)
+    (cond
+      ((null? lat) (col '() '()))
+      ((eq? a (car lat)) (multirember&co a (cdr lat) (lambda (newlat seen) (col newlat (cons (car lat) seen)))))
+      (else (multirember&co a (cdr lat) (lambda (newlat seen) (col (cons (car lat) newlat) seen)))))))
+
+(define multiinsertLR
+  (lambda (new oldL oldR lat)
+    (cond
+      ((null? lat) '())
+      ((eq? oldL (car lat)) (cons new (cons oldL (multiinsertLR new oldL oldR (cdr lat)))))
+      ((eq? oldR (car lat)) (cons oldR (cons new (multiinsertLR new oldL oldR (cdr lat)))))
+      (else (cons (car lat) (multiinsertLR new oldL oldR (cdr lat)))))))
+
+
+      
