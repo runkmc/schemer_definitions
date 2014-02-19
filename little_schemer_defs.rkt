@@ -524,3 +524,23 @@
          ((even? (car l)) (cons (car l) (evens-only (cdr l))))
          (else (evens-only (cdr l)))))
       (else (cons (evens-only (car l)) (evens-only (cdr l)))))))
+
+(define evens-only&co
+  (lambda (l col)
+    (cond
+      ((null? l) (col '() 1 0))
+      ((atom? (car l))
+       (cond
+         ((even? (car l)) (evens-only&co (cdr l) (lambda (newl product sum) (col (cons (car l) newl) (o* product (car l)) sum))))
+         (else (evens-only&co (cdr l) (lambda (newl product sum) (col newl product (o+ sum (car l))))))))
+      (else (evens-only&co (car l) (lambda (newl1 product1 sum1) (evens-only&co (cdr l) (lambda (newl2 product2 sum2) (col (cons newl1 newl2) (o* product1 product2) (o+ sum1 sum2))))))))))
+
+(define looking
+  (lambda (a lat)
+    (keep-looking a (pick 1 lat) lat)))
+
+(define keep-looking
+  (lambda (a n lat)
+    (cond
+      ((number? n) (keep-looking a (pick n lat) lat))
+      (else (eq? a n)))))
