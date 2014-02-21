@@ -544,3 +544,20 @@
     (cond
       ((number? n) (keep-looking a (pick n lat) lat))
       (else (eq? a n)))))
+
+(define shift
+  (lambda (pair)
+    (build (first (first pair)) (build (second (first pair)) (second pair)))))
+
+(define length*
+  (lambda (pora)
+    (cond
+      ((atom? pora) 1)
+      (else (o+ (length* (first pora)) (length* (second pora)))))))
+
+(define A
+  (lambda (n m)
+    (cond
+      ((zero? n) (add1 m))
+      ((zero? m) (A (sub1 n) 1))
+      (else (A (sub1 n) (A n (sub1 m)))))))
