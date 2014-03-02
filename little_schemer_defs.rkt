@@ -1,6 +1,3 @@
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname little_schemer_defs) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ())))
 (define atom?
   (lambda (x)
 	(and (not (pair? x)) (not (null? x)))))
@@ -18,7 +15,7 @@
 	  ((null? lat) #f)
 	  (else (or (equal? a (car lat)) (member? a (cdr lat)))))))
 
-(define rember
+(define rember 
   (lambda (s l)
     (cond
       ((null? l) '())
@@ -569,3 +566,7 @@
   (lambda (x)
     (eternity x)))
 
+(define Y
+  (lambda (le)
+    ((lambda (f) (f f)) 
+     (lambda (f) (le (lambda (x) ((f f) x)))))))
