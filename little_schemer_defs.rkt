@@ -15,6 +15,7 @@
 	  ((null? lat) #f)
 	  (else (or (equal? a (car lat)) (member? a (cdr lat)))))))
 
+(define rember 
 (define rember
   (lambda (s l)
     (cond
@@ -566,6 +567,10 @@
   (lambda (x)
     (eternity x)))
 
+(define Y
+  (lambda (le)
+    ((lambda (f) (f f)) 
+     (lambda (f) (le (lambda (x) ((f f) x)))))))
 (define new-entry build)
 
 (define lookup-in-entry
