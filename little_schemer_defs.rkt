@@ -647,3 +647,47 @@
     (text-of e)))
 
 (define text-of second)
+
+(define *identifier
+  (lambda (e table)
+    (lookup-in-table e table initial-table)))
+
+(define initial-table
+  (lambda (name)
+    (car (quote ()))))
+
+(define *lambda
+  (lambda (e table)
+    (build (quote non-primitive)
+           (cons table (cdr e)))))
+
+(define table-of first)
+
+(define formals-of second)
+
+(define body-of third)
+
+(define evcon
+  (lambda (lines table)
+    (cond
+      ((else? (question-of (car lines))) (meaning (answer-of (car-lines)) table))
+      ((meaning (question-of (car lines)) table) (meaning (answer-of (car lines)) table))
+      (else (evcon (cdr lines) table)))))
+
+(define else?
+  (lambda (z)
+    (cond
+      ((atom? z) (eq? z (quote else)))
+      (else #f))))
+
+(define question-of first)
+
+(define answer-of second)
+
+(define *cond
+  (lambda (e table)
+    (evcon (cond-lines-of e) table)))
+
+(define cond-lines-of cdr)
+
+
