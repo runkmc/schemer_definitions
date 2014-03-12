@@ -701,7 +701,7 @@
   (lambda (e table)
     (*apply
      (meaning (function-of e) table)
-     (evils (arguments-of) table))))
+     (evils (arguments-of e) table))))
 
 (define function-of car)
 
@@ -753,3 +753,7 @@
       ((eq? (car x) 'primitive) #t)
       ((eq? (car x) 'non-primitive) #t)
       (else #f))))
+
+(define apply-closure
+  (lambda (closure vals)
+    (meaning (body-of closure) (extend-table (new-entry (formals-of closure) vals) (table-of closure)))))
