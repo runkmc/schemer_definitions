@@ -690,4 +690,66 @@
 
 (define cond-lines-of cdr)
 
+(define evils
+  (lambda (args table)
+    (cond
+      ((null? args) (quote ()))
+      (else
+       (cons (meaning (car args) table) (evils (cdr args) table))))))
 
+(define *application
+  (lambda (e table)
+    (*apply
+     (meaning (function-of e) table)
+     (evils (arguments-of) table))))
+
+(define function-of car)
+
+(define arguments-of cdr)
+
+(define primitive?
+  (lambda (f)
+    (eq? (first f) (quote primitive))))
+
+(define non-primitive?
+  (lambda (f)
+    (eq? (first f) (quote non-primitive))))
+
+(define *apply
+  (lambda (fun vals)
+    (cond
+      ((primitive? fun) (apply-primitive (second fun) vals))
+      ((non-primitive? fun) (apply-closure (second fun) vals)))))
+
+(define apply-primitive
+  (lambda (name vals)
+    (cond
+      ((eq? name 'cons)
+       (cons (first vals) (second vals)))
+      ((eq? name 'car)
+       (car (first vals)))
+      ((eq? name 'cdr)
+       (cdr (first vals)))
+      ((eq? name 'null?)
+       (null? (first vals)))
+      ((eq? name 'eq?)
+       (eq? (first vals) (second vals)))
+      ((eq? name 'atom?)
+       (:atom? (first vals)))
+      ((eq? name 'zero?)
+       (zero? (first vals)))
+      ((eq? name 'add1)
+       (add1 (first vals)))
+      ((eq? name 'sub1)
+       (sub1 (first vals)))
+      ((eq? name 'number?)
+       (number? (first vals))))))
+
+(define :atom?
+  (lambda (x)
+    (cond
+      ((atom? x) #t)
+      ((null? x) #f)
+      ((eq? (car x) 'primitive) #t)
+      ((eq? (car x) 'non-primitive) #t)
+      (else #f))))
