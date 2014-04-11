@@ -63,3 +63,43 @@
     (cond
       ((null? lat) #f)
       (else (two-in-a-row-b? (car lat) (cdr lat))))))
+
+;; Sum of prefixes
+
+(define sum-of-prefixes-b
+  (lambda (sonssf tup)
+    (cond
+      ((null? tup) '())
+      (else 
+       (cons (+ sonssf (car tup)) (sum-of-prefixes-b (+ sonssf (car tup)) (cdr tup)))))))
+
+(define sum-of-prefixes
+  (lambda (tup)
+    (sum-of-prefixes-b 0 tup)))
+
+
+;; We will need pick in order to scramble
+
+(define one?
+  (lambda (n)
+    (eq? n 1)))
+
+(define pick
+  (lambda (n lat)
+    (cond
+      ((one? n) (car lat))
+      (else (pick (sub1 n) (cdr lat))))))
+
+;; Let's scramble
+
+(define scramble-b
+  (lambda (tup rev-pre)
+    (cond
+      ((null? tup) '())
+      (else
+       (cons (pick (car tup) (cons (car tup) rev-pre))
+             (scramble-b (cdr tup) (cons (car tup) rev-pre)))))))
+
+(define scramble
+  (lambda (tup)
+    (scramble-b tup '())))
