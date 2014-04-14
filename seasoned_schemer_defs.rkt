@@ -77,7 +77,6 @@
   (lambda (tup)
     (sum-of-prefixes-b 0 tup)))
 
-
 ;; We will need pick in order to scramble
 
 (define one?
@@ -103,3 +102,30 @@
 (define scramble
   (lambda (tup)
     (scramble-b tup '())))
+
+
+;; Begin Chapter 12!
+
+;; New multirember
+
+(define multirember-first
+  (lambda (a lat)
+    ((letrec
+         ((mr (lambda (lat)
+                (cond
+                  ((null? lat) '())
+                  ((eq? a (car lat)) (mr (cdr lat)))
+                  (else (cons (car lat) (mr (cdr lat))))))))
+       mr) lat)))
+
+;; Multirember simplified
+
+(define multirember
+  (lambda (a lat)
+    (letrec
+        ((mr (lambda (lat)
+               (cond
+                 ((null? lat) '())
+                 ((eq? a (car lat)) (mr (cdr lat)))
+                 (else (cons (car lat) (mr (cdr lat))))))))
+      (mr lat))))
