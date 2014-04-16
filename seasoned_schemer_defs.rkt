@@ -174,3 +174,38 @@
                             (else (N? (cdr lat)))))))
                  (N? lat)))))
       (U set1))))
+
+;; And for two-in-a-row
+
+(define two-in-a-row-letrec?
+  (letrec
+      ((W (lambda (a lat)
+            (cond
+              ((null? lat) #f)
+              (else (or (eq? a (car lat)) (W (car lat) (cdr lat))))))))
+    (lambda (lat)
+      (cond
+        ((null? lat) #f)
+        (else (W (car lat) (cdr lat)))))))
+
+;; Sum-of-prefixes...
+
+(define sum-of-prefixes-letrec
+  (lambda (tup)
+    (letrec
+        ((S (lambda (sss tup)
+              (cond
+                ((null? tup) '())
+                (else (cons (+ sss (car tup)) (S (+ sss (car tup)) (cdr tup))))))))
+      (S 0 tup))))
+
+;; Finish it off with scramble
+
+(define scramble-letrec
+  (letrec
+      ((P (lambda (tup rp)
+            (cond
+              ((null? tup) '())
+              (else (cons (pick (car tup) (cons (car tup) rp)) (P (cdr tup) (cons (car tup) rp))))))))
+    (lambda (tup)
+      (P tup '()))))
