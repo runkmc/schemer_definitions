@@ -129,3 +129,48 @@
                  ((eq? a (car lat)) (mr (cdr lat)))
                  (else (cons (car lat) (mr (cdr lat))))))))
       (mr lat))))
+
+;; Multirember-f, like before, only new
+
+(define multirember-f
+  (lambda (test?)
+    (letrec
+        ((m-f
+          (lambda (a lat)
+            (cond
+              ((null? lat) '())
+              ((test? a (car lat)) (m-f a (cdr lat)))
+              (else (cons (car lat) (m-f a (cdr lat))))))))
+      m-f)))
+
+;; Same treatment for member
+
+(define member-letrec?
+  (lambda (a lat)
+    (letrec
+        ((yes? (lambda (l)
+                 (cond
+                   ((null? l) #f)
+                   ((eq? (car l) a) #t)
+                   (else (yes? (cdr l)))))))
+      (yes? lat))))
+
+;; Same treatment for union, with member built right in
+
+(define union
+  (lambda (set1 set2)
+    (letrec
+        ((U (lambda (set)
+              (cond
+                ((null? set) set2)
+                ((M? (car set) set2) (U (cdr set)))
+                (else (cons (car set) (U (cdr set)))))))
+         (M? (lambda (a lat)
+               (letrec
+                   ((N? (lambda (lat)
+                          (cond
+                            ((null? lat) #f)
+                            ((eq? a (car lat)) #t)
+                            (else (N? (cdr lat)))))))
+                 (N? lat)))))
+      (U set1))))
