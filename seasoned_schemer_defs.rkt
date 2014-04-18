@@ -209,3 +209,19 @@
               (else (cons (pick (car tup) (cons (car tup) rp)) (P (cdr tup) (cons (car tup) rp))))))))
     (lambda (tup)
       (P tup '()))))
+
+
+;; Chapter 13
+
+;; Intersect with the 12th commandment
+
+(define intersect
+  (lambda (set1 set2)
+    (letrec
+        ((I (lambda (set)
+              (cond
+                ((null? set) '())
+                ((member? (car set) set2) (cons (car set) (I (cdr set))))
+                (else (I (cdr set)))))))
+      (I set1))))
+      
