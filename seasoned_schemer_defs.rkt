@@ -1,3 +1,6 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname seasoned_schemer_defs) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #t ())))
 ;; Preparing ourselves
 
 (define atom?
@@ -224,4 +227,34 @@
                 ((member? (car set) set2) (cons (car set) (I (cdr set))))
                 (else (I (cdr set)))))))
       (I set1))))
+
+;; Intersectall with the 12th commandment
+
+(define intersectall-letrec
+  (lambda (lset)
+    (letrec
+        ((A (lambda (lset)
+              (cond
+                ((null? (cdr lset)) (car lset))
+                (else (intersect (car lset) (A (cdr lset))))))))
+      (cond
+        ((null? lset) '())
+        (else (A lset))))))
+
+;; Intersectall with letcc
+
+(define intersectall
+  (lambda (lset)
+    (letcc hop
+      (letrec
+          ((A (lambda (lset)
+                (cond
+                  ((null? (car lset)) (hop '()))
+                  ((null? (cdr lset)) (car lset))
+                  (else (intersect (car lset) (A (cdr lset))))))))
+        (cond
+          ((null? lset) '())
+          (else (A lset)))))))
+
+
       
