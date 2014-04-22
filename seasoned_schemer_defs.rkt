@@ -15,6 +15,20 @@
   (lambda (n)
 	(- n 1)))
 
+;; We're going to need these as well.
+
+(define-syntax letcc 
+  (syntax-rules () 
+    ((letcc var body ...) 
+     (call-with-current-continuation 
+       (lambda (var)  body ... ))))) 
+
+(define-syntax try 
+  (syntax-rules () 
+    ((try var a . b) 
+     (letcc success 
+       (letcc var (success a)) . b)))) 
+
 ;; Begin Chapter 11!
 
 ;; We remember member
@@ -227,34 +241,4 @@
                 ((member? (car set) set2) (cons (car set) (I (cdr set))))
                 (else (I (cdr set)))))))
       (I set1))))
-
-;; Intersectall with the 12th commandment
-
-(define intersectall-letrec
-  (lambda (lset)
-    (letrec
-        ((A (lambda (lset)
-              (cond
-                ((null? (cdr lset)) (car lset))
-                (else (intersect (car lset) (A (cdr lset))))))))
-      (cond
-        ((null? lset) '())
-        (else (A lset))))))
-
-;; Intersectall with letcc
-
-(define intersectall
-  (lambda (lset)
-    (letcc hop
-      (letrec
-          ((A (lambda (lset)
-                (cond
-                  ((null? (car lset)) (hop '()))
-                  ((null? (cdr lset)) (car lset))
-                  (else (intersect (car lset) (A (cdr lset))))))))
-        (cond
-          ((null? lset) '())
-          (else (A lset)))))))
-
-
       
