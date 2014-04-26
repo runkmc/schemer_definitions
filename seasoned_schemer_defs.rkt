@@ -264,7 +264,7 @@
 
 ;; Intersectall with letcc
 
-(define intersectall
+(define intersectall-letcc
   (lambda (lset)
     (letcc hop
       (letrec
@@ -276,3 +276,67 @@
         (cond
           ((null? lset) '())
           (else (I lset)))))))
+
+;; Intersectall with letcc and intersect built in -- also with letcc!
+;; Also I'm pretty sure the book has a mistake in the member? line of I. It conses on else instead of member?.
+;; The version I think is right is below.
+
+(define intersectall
+  (lambda (lset)
+    (letcc hop
+      (letrec
+          ((A (lambda (lset)
+                (cond
+                  ((null? (car lset)) (hop '()))
+                  ((null? (cdr lset)) (car lset))
+                  (else (I (car lset) (A (cdr lset)))))))
+           (I (lambda (s1 s2)
+                (letrec
+                    ((J (lambda (s1)
+                          (cond
+                            ((null? s1) '())
+                            ((member? (car s1) s2) (cons (car s1) (J (cdr s1))))
+                            (else (J (cdr s1)))))))
+                  (cond
+                    ((null? s2) (hop '()))
+                    (else (J s1)))))))
+        (cond
+          ((null? lset) '())
+          (else (A lset)))))))
+
+;; Moving on, let's try rember with letrec
+
+(define rember-letrec
+  (lambda (a lat)
+    (letrec
+        ((R (lambda (lat)
+              (cond
+                ((null? lat) '())
+                ((eq? a (car lat)) (cdr lat))
+                (else (cons (car lat) (R (cdr lat))))))))
+      (R lat))))
+
+;; Rember beyond first, setting us up for...
+
+(define rember-beyond-first
+  (lambda (a lat)
+    (letrec
+        ((R (lambda (lat)
+              (cond
+                ((null? lat) '())
+                ((eq? a (car lat)) '())
+                (else (cons (car lat) (R (cdr lat))))))))
+      (R lat))))
+
+;; rember-upto-last
+
+(define rember-upto-last
+  (lambda (a lat)
+    (letcc skip
+      (letrec
+          ((R (lambda (lat)
+                (cond
+                  ((null? lat) '())
+                  ((eq? (car lat) a) (skip (R (cdr lat))))
+                  (else (cons (car lat) (R (cdr lat))))))))
+        (R lat)))))
