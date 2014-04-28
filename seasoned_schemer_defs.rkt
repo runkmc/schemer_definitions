@@ -340,3 +340,12 @@
                   ((eq? (car lat) a) (skip (R (cdr lat))))
                   (else (cons (car lat) (R (cdr lat))))))))
         (R lat)))))
+
+;; Chapter 14
+;; Our old friend leftmost
+
+(define leftmost-old
+  (lambda (l)
+    (cond
+      ((atom? (car l)) (car l))
+      (else (leftmost-old (car l))))))
