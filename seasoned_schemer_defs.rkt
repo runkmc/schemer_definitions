@@ -12,7 +12,29 @@
   (lambda (n)
 	(- n 1)))
 
-;; We're going to need these as well.
+(define eqlist?
+  (lambda (ls1 ls2)
+    (cond
+      ((and (null? ls1) (null? ls2)) #t)
+      ((or (null? ls1) (null? ls2) #f))
+      (else (and (oequal? (car ls1) (car ls2)) (eqlist? (cdr ls1) (cdr ls2)))))))
+
+(define oequal?
+  (lambda (s1 s2)
+    (cond
+      ((and (atom? s1) (atom? s2)) (eqan? s1 s2))
+      ((or (atom? s1) (atom? s2)) #f)
+      (else
+       (eqlist? s1 s2)))))
+
+(define eqan?
+  (lambda (a1 a2)
+    (cond
+      ((and (number? a1) (number? a2)) (o= a1 a2))
+      ((or (number? a1) (number? a2)) #f)
+      (else (eq? a1 a2)))))
+
+;; We're going to need these as well for R5RS
 
 (define-syntax letcc 
   (syntax-rules () 
@@ -342,10 +364,104 @@
         (R lat)))))
 
 ;; Chapter 14
-;; Our old friend leftmost
+;; Our old friend leftmost, new and improved with let
 
-(define leftmost-old
+(define leftmost
   (lambda (l)
     (cond
+      ((null? l) '())
       ((atom? (car l)) (car l))
-      (else (leftmost-old (car l))))))
+      (else
+       (let ((a (leftmost (car l))))
+         (cond
+           ((atom? a) a)
+           (else (leftmost (cdr l)))))))))
+
+;; rember1 fixed with the 12th commandment
+
+(define rember1
+  (lambda (a l)
+    (letrec
+        ((R (lambda (l)
+              (cond
+                ((null? l) '())
+                ((atom? (car l))
+                 (cond
+                   ((eq? a (car l)) (cdr l))
+                   (else (cons (car l) (R (cdr l))))))
+                (else
+                 (cond
+                   ((eqlist? (R (car l)) (car l)) (cons (car l) (R (cdr l))))
+                   (else (cons (R (car l)) (cdr l)))))))))
+      (R l))))
+
+;; rember1 fixed with the 15th commandment as well
+
+(define rember2
+  (lambda (a l)
+    (letrec
+        ((R (lambda (l)
+              (cond
+                ((null? l) '())
+                ((atom? (car l))
+                 (cond
+                   ((eq? (car l) a) (cdr l))
+                   (else (cons (car l) (R (cdr l))))))
+                (else
+                 (let ((av (R (car l))))
+                   (cond
+                     ((eqlist? (car l) av) (cons (car l) (R (cdr l))))
+                     (else (cons av (cdr l))))))))))
+      (R l))))
+
+;; here is depth
+
+(define depth-first
+  (lambda (l)
+    (cond
+      ((null? l) 1)
+      ((atom? (car l)) (depth-first (cdr l)))
+      (else
+       (cond
+         ((> (depth-first (cdr l)) (add1 (depth-first (car l)))) (depth-first (cdr l)))
+         (else (add1 (depth-first (car l)))))))))
+
+(define depth-let
+  (lambda (l)
+    (cond
+      ((null? l) 1)
+      ((atom? (car l)) (depth (cdr l)))
+      (else
+       (let ((a (add1 (depth (car l)))) (d (depth (cdr l))))
+         (cond
+           ((> d a) d)
+           (else a)))))))
+
+;; Let's use if to make our lives easier
+
+(define max*
+  (lambda (m n)
+    (if (> m n) m n)))
+
+(define depth
+  (lambda (l)
+    (cond
+      ((null? l) 1)
+      ((atom? (car l)) (depth (cdr l)))
+      (else (max*
+             (add1 (depth (car l))) (depth (cdr l)))))))
+
+;; leftmost again, but better, faster, stronger.
+
+(define new-leftmost
+  (lambda (l)
+    (letcc skip (lm l skip))))
+
+(define lm
+  (lambda (l out)
+    (cond
+      ((null? l) '())
+      ((atom? (car l)) (out (car l)))
+      (else (let ()
+              (lm (car l) out)
+              (lm (cdr l) out))))))
