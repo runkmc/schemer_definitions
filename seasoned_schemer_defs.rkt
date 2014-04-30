@@ -465,3 +465,19 @@
       (else (let ()
               (lm (car l) out)
               (lm (cdr l) out))))))
+
+;; But what about the 12th commandment?
+
+(define leftmost
+  (lambda (l)
+    (letcc skip
+      (letrec
+          ((lm (lambda (l)
+                 (cond
+                   ((null? l) '())
+                   ((atom? (car l)) (skip (car l)))
+                   (else
+                    (let ()
+                      (lm (car l))
+                      (lm (cdr l))))))))
+        (lm l)))))
