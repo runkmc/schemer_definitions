@@ -481,3 +481,20 @@
                       (lm (car l))
                       (lm (cdr l))))))))
         (lm l)))))
+
+;; improved rember1
+
+(define rm
+  (lambda (a l oh)
+    (cond
+      ((null? (oh 'no)))
+      ((atom? (car l))
+       (if (eq? a (car l))
+           (cdr l)
+           (cons (car l) (rm a (cdr l) oh))))
+      (else
+       (if (atom? (letcc oh
+                    (rm a (car l) oh)))
+           (cons (car l) (rm a (car l) oh))
+           (cons (rm a (car l) 0) (cdr l)))))))
+
