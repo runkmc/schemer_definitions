@@ -498,3 +498,42 @@
            (cons (car l) (rm a (car l) oh))
            (cons (rm a (car l) 0) (cdr l)))))))
 
+;; Chapter 15
+;; Remembering what we had for dinner
+
+(define x 'gone)
+
+(define diner
+  (lambda (food)
+    (set! x food)
+    (cons 'milkshake (cons food '()))))
+
+(define gourmand
+  (lambda (food)
+    (set! x food)
+    (cons food (cons x '()))))
+
+;; set! in it's proper context
+
+(define omnivore
+  (let ((x (quote minestrone)))
+    (lambda (food)
+      (set! x food)
+      (cons food (cons x '())))))
+
+;; A glutton
+
+(define food 'none)
+
+(define glutton
+  (lambda (x)
+    (set! food x)
+    (cons 'more (cons x (cons 'more (cons x '()))))))
+
+;; flip x and food
+
+(define chez-nous
+  (lambda ()
+    (let ((a food))
+      (set! food x)
+      (set x a))))
