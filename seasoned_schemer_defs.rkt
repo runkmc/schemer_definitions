@@ -537,3 +537,68 @@
     (let ((a food))
       (set! food x)
       (set x a))))
+
+;; Chapter 16
+
+(define last (quote angelfood))
+
+(define sweet-toothL
+  (lambda (food)
+    (set! last food)
+    (cons food
+          (cons 'cake '()))))
+
+;; Can we remember the different types of cake?
+
+(define ingredients '())
+
+(define sweet-toothR
+  (lambda (food)
+    (set! ingredients (cons food ingredients))
+    (cons ingredients (cons 'cake '()))))
+
+;; going deep
+
+(define deep-old
+  (lambda (m)
+    (cond
+      ((zero? m) 'pizza)
+      (else (cons (deep (sub1 m)) '())))))
+
+;; deep, with memory
+
+(define Ns '())
+(define Rs '())
+
+(define deepR
+  (lambda (n)
+    (let ((result (deep n)))
+      (set! Rs (cons result Rs))
+      (set! Ns (cons n Ns))
+      result)))
+
+(define find
+  (lambda (n Ns Rs)
+    (letrec
+        ((A (lambda (ns rs)
+              (cond
+                ((= (car ns) n) (car rs))
+                (else (A (cdr ns) (cdr rs)))))))
+      (A Ns Rs))))
+
+;; deepM uses everything, with deepR built in
+
+(define deep
+  (lambda (m)
+    (cond
+      ((zero? m) 'pizza)
+      (else (cons (deepM (sub1 m)) '())))))
+
+(define deepM
+  (lambda (n)
+    (if (member? n NS)
+        (find n Ns Rs)
+        (let ((result (deep n)))
+          (set! Rs (cons result Rs))
+          (set! Ns (cons n Ns))
+          result))))
