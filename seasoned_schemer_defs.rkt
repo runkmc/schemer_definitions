@@ -582,6 +582,7 @@
     (letrec
         ((A (lambda (ns rs)
               (cond
+                ((null? ns) #f)
                 ((= (car ns) n) (car rs))
                 (else (A (cdr ns) (cdr rs)))))))
       (A Ns Rs))))
@@ -595,10 +596,13 @@
       (else (cons (deepM (sub1 m)) '())))))
 
 (define deepM
-  (lambda (n)
-    (if (member? n NS)
-        (find n Ns Rs)
-        (let ((result (deep n)))
-          (set! Rs (cons result Rs))
-          (set! Ns (cons n Ns))
-          result))))
+  (let ((Rs (quote ()))
+        (Ns (quote ())))
+    (lambda (n)
+      (let ((exists (find n Ns Rs)))
+        (if (atom? exists)
+            (let ((result (deep n)))
+              (set! Rs (cons result Rs))
+              (set! Ns (cons n Ns))
+              result)
+            exists)))))
